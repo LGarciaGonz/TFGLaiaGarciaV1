@@ -5,6 +5,7 @@ import 'package:litlens_v1/features/authentication/presentation/cubits/auth_cubi
 import 'package:litlens_v1/features/profile/presentation/components/bio_box.dart';
 import 'package:litlens_v1/features/profile/presentation/cubits/profile_cubit.dart';
 import 'package:litlens_v1/features/profile/presentation/cubits/profile_state.dart';
+import 'package:litlens_v1/features/profile/presentation/pages/edit_profile_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final String uid;
@@ -41,11 +42,25 @@ class _ProfilePageState extends State<ProfilePage> {
         if (state is ProfileLoaded) {
           // Obtener el usuario actual.
           final user = state.profileUser;
+
+          // SCAFFOLD ------------------
           return Scaffold(
+            // APP BAR ------------------
             appBar: AppBar(
               centerTitle: true,
               title: Text(user.name),
               foregroundColor: Theme.of(context).colorScheme.primary,
+              actions: [
+                IconButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditProfilePage(user: user),
+                    ),
+                  ),
+                  icon: Icon(Icons.settings),
+                ),
+              ],
             ),
 
             // BODY ------------------
@@ -100,7 +115,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 const SizedBox(height: 25),
 
-                // Bio ----
+                // Publicaciones ----
                 Padding(
                   padding: const EdgeInsets.only(left: 25, top: 25),
                   child: Row(

@@ -156,8 +156,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:litlens_v1/features/authentication/presentation/components/pers_button.dart';
-import 'package:litlens_v1/features/authentication/presentation/components/pers_text_field.dart';
+import 'package:litlens_v1/features/authentication/presentation/components/my_button.dart';
+import 'package:litlens_v1/features/authentication/presentation/components/my_text_field.dart';
 import 'package:litlens_v1/features/authentication/presentation/cubits/auth_cubit.dart';
 
 class LoginPage extends StatefulWidget {
@@ -242,7 +242,7 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 25),
 
                         // Campo email
-                        PersTextField(
+                        MyTextField(
                           controller: emailController,
                           hintText: "Email",
                           obscureText: false,
@@ -251,7 +251,7 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 10),
 
                         // Campo contraseña
-                        PersTextField(
+                        MyTextField(
                           controller: passwordController,
                           hintText: "Contraseña",
                           obscureText: true,
@@ -260,7 +260,7 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(height: 25),
 
                         // Botón inicio sesión
-                        PersButton(onTap: login, text: 'Iniciar sesión'),
+                        MyButton(onTap: login, text: 'Iniciar sesión'),
 
                         const SizedBox(height: 50),
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:litlens_v1/features/authentication/presentation/components/pers_button.dart';
-import 'package:litlens_v1/features/authentication/presentation/components/pers_text_field.dart';
+import 'package:litlens_v1/features/authentication/presentation/components/my_button.dart';
+import 'package:litlens_v1/features/authentication/presentation/components/my_text_field.dart';
 import 'package:litlens_v1/features/authentication/presentation/cubits/auth_cubit.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -95,7 +95,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 25),
 
                         // Campo nombre
-                        PersTextField(
+                        MyTextField(
                           controller: nameController,
                           hintText: "Nombre",
                           obscureText: false,
@@ -104,7 +104,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 10),
 
                         // Campo email
-                        PersTextField(
+                        MyTextField(
                           controller: emailController,
                           hintText: "Email",
                           obscureText: false,
@@ -113,7 +113,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 10),
 
                         // Campo contraseña
-                        PersTextField(
+                        MyTextField(
                           controller: passwordController,
                           hintText: "Contraseña",
                           obscureText: true,
@@ -122,7 +122,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 10),
 
                         // Campo confirmar contraseña
-                        PersTextField(
+                        MyTextField(
                           controller: confirmPasswordController,
                           hintText: "Confirmar contraseña",
                           obscureText: true,
@@ -131,7 +131,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 25),
 
                         // Botón crear cuenta
-                        PersButton(onTap: register, text: 'Crear cuenta'),
+                        MyButton(onTap: register, text: 'Crear cuenta'),
 
                         const SizedBox(height: 50),
 
