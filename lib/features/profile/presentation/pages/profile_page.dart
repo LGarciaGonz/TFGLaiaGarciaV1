@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:litlens_v1/features/authentication/domain/entities/app_user.dart';
 import 'package:litlens_v1/features/authentication/presentation/cubits/auth_cubit.dart';
+import 'package:litlens_v1/features/profile/presentation/components/bio_box.dart';
 import 'package:litlens_v1/features/profile/presentation/cubits/profile_cubit.dart';
 import 'package:litlens_v1/features/profile/presentation/cubits/profile_state.dart';
 
@@ -45,6 +46,75 @@ class _ProfilePageState extends State<ProfilePage> {
               centerTitle: true,
               title: Text(user.name),
               foregroundColor: Theme.of(context).colorScheme.primary,
+            ),
+
+            // BODY ------------------
+            body: Column(
+              children: [
+                Text(
+                  user.email,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+
+                const SizedBox(height: 25),
+
+                // Foto de perfil ----
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.secondary,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  height: 120,
+                  width: 120,
+                  padding: const EdgeInsets.all(25),
+                  child: Center(
+                    child: Icon(
+                      Icons.person,
+                      size: 70,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 25),
+
+                // Bio ----
+                Padding(
+                  padding: const EdgeInsets.only(left: 25),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Biografía",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 25),
+
+                BioBox(text: user.bio),
+
+                const SizedBox(height: 25),
+
+                // Bio ----
+                Padding(
+                  padding: const EdgeInsets.only(left: 25, top: 25),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Publicaciones",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           );
         } else if (state is ProfileLoading) {
