@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1046190429515",
+    "project_id": "litlens-a0f5b",
+    "storage_bucket": "litlens-a0f5b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1046190429515:android:91992e09d94bce9dd284ce",
+        "android_client_info": {
+          "package_name": "com.example.litlens_v1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1046190429515-cdp6n6mpcjn19fpt6ufp1h7lvj62ps5i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVfDXfkPOca4WsCld0s9OcRztjdEHGl8g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1046190429515-cdp6n6mpcjn19fpt6ufp1h7lvj62ps5i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1046190429515-ugo2vg09int87j5ee63aftks1c44cdrv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.litlensV1"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
