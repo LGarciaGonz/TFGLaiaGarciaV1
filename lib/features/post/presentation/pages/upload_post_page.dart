@@ -272,6 +272,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:litlens_v1/features/authentication/domain/entities/app_user.dart';
+import 'package:litlens_v1/features/authentication/presentation/components/my_bottom_navigation_bar.dart';
 import 'package:litlens_v1/features/authentication/presentation/components/my_text_field.dart';
 import 'package:litlens_v1/features/authentication/presentation/cubits/auth_cubit.dart';
 import 'package:litlens_v1/features/post/domain/entities/post.dart';
@@ -367,7 +368,6 @@ class _UploadPostPageState extends State<UploadPostPage> {
         return buildUploadPage();
       },
 
-      
       listener: (context, state) {
         if (state is PostsLoaded) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -394,12 +394,10 @@ class _UploadPostPageState extends State<UploadPostPage> {
   }
 
   Widget buildUploadPage() {
+    final theme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text("Nueva publicación"),
-        // foregroundColor: Theme.of(context).colorScheme.primary,
-      ),
+      appBar: AppBar(centerTitle: true, title: const Text("Nueva publicación")),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -451,19 +449,47 @@ class _UploadPostPageState extends State<UploadPostPage> {
               const SizedBox(height: 8),
               buildStarsSelector(),
               const SizedBox(height: 30),
+
+              // SizedBox(
+              //   width: double.infinity,
+              //   child: ElevatedButton(
+              //     onPressed: _isFormValid ? uploadPost : null,
+              //     child: const Padding(
+              //       padding: EdgeInsets.symmetric(vertical: 14),
+              //       child: Text('Publicar', style: TextStyle(fontSize: 16)),
+              //     ),
+              //   ),
+              // ),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: _isFormValid ? uploadPost : null,
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                    child: Text('Publicar', style: TextStyle(fontSize: 16)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _isFormValid
+                        ? Theme.of(context)
+                              .colorScheme
+                              .primary // Gris más oscuro
+                        : Theme.of(
+                            context,
+                          ).colorScheme.tertiary, // Gris más claro
+                    foregroundColor: Theme.of(
+                      context,
+                    ).colorScheme.inversePrimary,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
+                  child: const Text('Publicar reseña', style: TextStyle(fontSize: 16)),
                 ),
               ),
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: CustomBottomNavigationBar(
+        surface: theme.surface,
+        primary: theme.primary,
+        inversePrimary: theme.inversePrimary,
+        tertiary: theme.tertiary,
+        currentPage: PageType.upload,
       ),
     );
   }

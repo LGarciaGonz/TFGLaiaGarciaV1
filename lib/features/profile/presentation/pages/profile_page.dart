@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:litlens_v1/features/authentication/domain/entities/app_user.dart';
+import 'package:litlens_v1/features/authentication/presentation/components/my_bottom_navigation_bar.dart';
 import 'package:litlens_v1/features/authentication/presentation/cubits/auth_cubit.dart';
 import 'package:litlens_v1/features/profile/presentation/components/bio_box.dart';
 import 'package:litlens_v1/features/profile/presentation/cubits/profile_cubit.dart';
@@ -36,6 +37,8 @@ class _ProfilePageState extends State<ProfilePage> {
   // INTEREFAZ ---------------
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context).colorScheme;
+
     return BlocBuilder<ProfileCubit, ProfileState>(
       builder: (context, state) {
         // Cargado.
@@ -49,7 +52,7 @@ class _ProfilePageState extends State<ProfilePage> {
             appBar: AppBar(
               centerTitle: true,
               title: Text(user.name),
-              foregroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: theme.primary,
               actions: [
                 IconButton(
                   onPressed: () => Navigator.push(
@@ -66,30 +69,21 @@ class _ProfilePageState extends State<ProfilePage> {
             // BODY ------------------
             body: Column(
               children: [
-                Text(
-                  user.email,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
+                Text(user.email, style: TextStyle(color: theme.primary)),
 
                 const SizedBox(height: 25),
 
                 // Foto de perfil ----
                 Container(
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondary,
+                    color: theme.secondary,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   height: 120,
                   width: 120,
                   padding: const EdgeInsets.all(25),
                   child: Center(
-                    child: Icon(
-                      Icons.person,
-                      size: 70,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                    child: Icon(Icons.person, size: 70, color: theme.primary),
                   ),
                 ),
 
@@ -100,12 +94,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   padding: const EdgeInsets.only(left: 25),
                   child: Row(
                     children: [
-                      Text(
-                        "Biografía",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
+                      Text("Biografía", style: TextStyle(color: theme.primary)),
                     ],
                   ),
                 ),
@@ -122,14 +111,20 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       Text(
                         "Publicaciones",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
+                        style: TextStyle(color: theme.primary),
                       ),
                     ],
                   ),
                 ),
               ],
+            ),
+
+            bottomNavigationBar: CustomBottomNavigationBar(
+              surface: theme.surface,
+              primary: theme.primary,
+              inversePrimary: theme.inversePrimary,
+              tertiary: theme.tertiary,
+              currentPage: PageType.profile,
             ),
           );
         } else if (state is ProfileLoading) {
@@ -139,8 +134,6 @@ class _ProfilePageState extends State<ProfilePage> {
         } else {
           return const Center(child: Text("No se ha encontrado el perfil"));
         }
-
-        // Cargando.
       },
     );
   }
