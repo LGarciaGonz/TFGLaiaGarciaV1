@@ -14,17 +14,25 @@ class FirebaseAuthRepository implements AuthRepository {
       UserCredential userCredential = await firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
 
+      // Buscar el document del usuario.
+      DocumentSnapshot userDoc = await firebaseFirestore
+          .collection('users')
+          .doc(userCredential.user!.uid)
+          .get();
+
       // Crear usuario.
       AppUser user = AppUser(
         uid: userCredential.user!.uid,
         email: email,
-        name: '',
+        name: userDoc['name'],
       );
 
       // Retornar usuario.
       return user;
     } catch (exc) {
-      throw Exception('Error al iniciar sesión: $exc'); // Informar del error en el login.
+      throw Exception(
+        'Error al iniciar sesión: $exc',
+      ); // Informar del error en el login.
     }
   }
 
@@ -55,7 +63,9 @@ class FirebaseAuthRepository implements AuthRepository {
       // Retornar usuario.
       return user;
     } catch (exc) {
-      throw Exception('Error al iniciar sesión: $exc'); // Informar del error en el login.
+      throw Exception(
+        'Error al iniciar sesión: $exc',
+      ); // Informar del error en el login.
     }
   }
 
@@ -72,7 +82,22 @@ class FirebaseAuthRepository implements AuthRepository {
     // Si no hay usuario loggeado:
     if (firebaseUser == null) return null;
 
+    // Obtener el document del usuario.
+    DocumentSnapshot userDoc = await firebaseFirestore
+        .collection("users")
+        .doc(firebaseUser.uid)
+        .get();
+
+    // Comprobar que el document existe.
+    if (!userDoc.exists) {
+      return null;
+    }
+
     // Si hay usuario loggeado:
-    return AppUser(uid: firebaseUser.uid, email: firebaseUser.email!, name: '');
+    return AppUser(
+      uid: firebaseUser.uid,
+      email: firebaseUser.email!,
+      name: userDoc['name'],
+    );
   }
 }

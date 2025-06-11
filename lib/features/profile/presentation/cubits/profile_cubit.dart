@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:litlens_v1/features/profile/domain/entities/profile_user.dart';
 import 'package:litlens_v1/features/profile/domain/repositories/profile_repository.dart';
 import 'package:litlens_v1/features/profile/presentation/cubits/profile_state.dart';
 
@@ -23,7 +24,13 @@ class ProfileCubit extends Cubit<ProfileState> {
     }
   }
 
-  // Actualizar bio y foto de perfil.
+  // Devolver el perfil del usuario para los posts.
+  Future<ProfileUser?> getUserProfile(String uid) async {
+    final user = await profileRepository.fetchUserProfile(uid);
+    return user;
+  }
+
+  // Actualizar bio
   Future<void> updateProfile({required String uid, String? newBio}) async {
     emit(ProfileLoading());
     try {
@@ -35,9 +42,7 @@ class ProfileCubit extends Cubit<ProfileState> {
         return;
       }
 
-      // Actualizar foto de perfil.
-
-      // Actualizar el perfil.
+      // Actualizar la bio del perfil.
       final updatedProfile = currentUser.copyWith(
         newBio: newBio ?? currentUser.bio,
       );

@@ -22,7 +22,11 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:litlens_v1/features/authentication/presentation/components/post_tile.dart';
 import 'package:litlens_v1/features/home/presentation/components/my_drawer.dart';
+import 'package:litlens_v1/features/post/presentation/cubits/posts_cubit.dart';
+import 'package:litlens_v1/features/post/presentation/cubits/posts_state.dart';
 import 'package:litlens_v1/features/post/presentation/pages/upload_post_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -33,6 +37,29 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // Post cubit
+  late final postCubit = context.read<PostsCubit>();
+
+  // Al iniciar:
+  @override
+  void initState() {
+    super.initState();
+
+    // Cargar todos los posts
+    fetchAllPosts();
+  }
+
+  // Cargar todos los posts.
+  void fetchAllPosts() {
+    postCubit.fetchAllPosts();
+  }
+
+  // Eliminar post.
+  void deletePost(String postId) {
+    postCubit.deletePost(postId);
+    fetchAllPosts();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
@@ -40,9 +67,46 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(centerTitle: true, title: const Text("LitLens")),
       drawer: MyDrawer(),
+      body: SafeArea(
+        child: BlocBuilder<PostsCubit, PostsState>(
+          builder: (context, state) {
+            // Cargando.
+            if (state is PostsLoading || state is PostsUploading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            // Cargado.
+            else if (state is PostsLoaded) {
+              final allPosts = state.posts;
+              if (allPosts.isEmpty) {
+                return const Center(
+                  child: Text('No hay publicaciones disponibles'),
+                );
+              }
+              return ListView.builder(
+                itemCount: allPosts.length,
+                itemBuilder: (context, index) {
+                  // Obtener cada uno de los posts por separado.
+                  final post = allPosts[index];
+
+                  // Mostrar publicación.
+                  return PostTile(
+                    post: post,
+                    onDeletePressed: () => deletePost(post.id),
+                  );
+                },
+              );
+            }
+            // Error.
+            else if (state is PostsError) {
+              return Center(child: Text("Error al cargar las publicaciones"));
+            } else {
+              return SizedBox();
+            }
+          },
+        ),
+      ),
 
       // ✅ Contenido seguro
-      body: const SafeArea(child: Center(child: Text("Contenido principal"))),
 
       // ✅ BottomAppBar con protección contra overflow
       bottomNavigationBar: SafeArea(
@@ -75,7 +139,10 @@ class _HomePageState extends State<HomePage> {
                 // ➕ Botón central más grande y redondo
                 Expanded(
                   child: GestureDetector(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => UploadPostPage())),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => UploadPostPage()),
+                    ),
                     child: Center(
                       child: Container(
                         width: 56,

@@ -267,7 +267,6 @@
 // //     super.dispose();
 // //   }
 // // }
-
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -338,7 +337,6 @@ class _UploadPostPageState extends State<UploadPostPage> {
       return;
     }
     if (!_isFormValid) {
-      // Protección extra, aunque el botón ya debería estar deshabilitado
       return;
     }
 
@@ -368,9 +366,28 @@ class _UploadPostPageState extends State<UploadPostPage> {
         }
         return buildUploadPage();
       },
+
+      
       listener: (context, state) {
         if (state is PostsLoaded) {
-          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('¡Tu reseña se publicó correctamente!'),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+            ),
+          );
+          Navigator.pop(
+            context,
+          ); // Esto puede ir antes o después del snackbar, según UX
+        } else if (state is PostsError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                'Ocurrió un error al publicar. Inténtalo de nuevo.',
+              ),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
         }
       },
     );
@@ -381,13 +398,27 @@ class _UploadPostPageState extends State<UploadPostPage> {
       appBar: AppBar(
         centerTitle: true,
         title: const Text("Nueva publicación"),
-        foregroundColor: Theme.of(context).colorScheme.primary,
+        // foregroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
           child: Column(
             children: [
+              const SizedBox(
+                height: 40,
+              ), // Más separación desde el borde superior
+              Text(
+                "¿Terminaste un libro? ¡Es hora de contarlo todo (sin spoilers)!",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 30),
+
               MyTextField(
                 controller: titleController,
                 hintText: 'Título',
@@ -400,12 +431,24 @@ class _UploadPostPageState extends State<UploadPostPage> {
                 obscureText: false,
               ),
               const SizedBox(height: 12),
-              MyTextField(
-                controller: reviewController,
-                hintText: 'Reseña',
-                obscureText: false,
+              SizedBox(
+                height: 150,
+                child: MyTextField(
+                  controller: reviewController,
+                  hintText: 'Reseña',
+                  obscureText: false,
+                  expands: true,
+                ),
               ),
               const SizedBox(height: 20),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Puntuación:',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+              ),
+              const SizedBox(height: 8),
               buildStarsSelector(),
               const SizedBox(height: 30),
               SizedBox(
