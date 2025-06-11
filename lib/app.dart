@@ -5,6 +5,8 @@ import 'package:litlens_v1/features/authentication/presentation/cubits/auth_cubi
 import 'package:litlens_v1/features/authentication/presentation/cubits/auth_state.dart';
 import 'package:litlens_v1/features/authentication/presentation/pages/authentication_page.dart';
 import 'package:litlens_v1/features/home/presentation/pages/home_page.dart';
+import 'package:litlens_v1/features/post/data/firebase_post_repository.dart';
+import 'package:litlens_v1/features/post/presentation/cubits/posts_cubit.dart';
 import 'package:litlens_v1/features/profile/data/firebase_profile_repository.dart';
 import 'package:litlens_v1/features/profile/presentation/cubits/profile_cubit.dart';
 import 'package:litlens_v1/themes/light_mode.dart';
@@ -12,7 +14,12 @@ import 'package:litlens_v1/themes/light_mode.dart';
 class MainApp extends StatelessWidget {
   // Auth repository
   final authRepo = FirebaseAuthRepository();
+
+  // Perfil repository
   final profileRepo = FirebaseProfileRepository();
+
+  // Post repository
+  final firebasePostRepo = FirebasePostRepository();
 
   MainApp({super.key});
 
@@ -27,8 +34,12 @@ class MainApp extends StatelessWidget {
 
         // Perfil cubit.
         BlocProvider<ProfileCubit>(
-          create: (context) =>
-              ProfileCubit(profileRepository: profileRepo),
+          create: (context) => ProfileCubit(profileRepository: profileRepo),
+        ),
+
+        // Post cubit.
+        BlocProvider<PostsCubit>(
+          create: (context) => PostsCubit(firebasePostRepo),
         ),
       ],
       child: MaterialApp(
