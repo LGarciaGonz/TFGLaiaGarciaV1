@@ -52,7 +52,6 @@ class _ProfilePageState extends State<ProfilePage> {
             appBar: AppBar(
               centerTitle: true,
               title: Text(user.name),
-              foregroundColor: theme.primary,
               actions: [
                 IconButton(
                   onPressed: () => Navigator.push(
@@ -69,10 +68,7 @@ class _ProfilePageState extends State<ProfilePage> {
             // BODY ------------------
             body: Column(
               children: [
-                Text(user.email, style: TextStyle(color: theme.primary)),
-
-                const SizedBox(height: 25),
-
+                const SizedBox(height: 40),
                 // Foto de perfil ----
                 Container(
                   decoration: BoxDecoration(
@@ -89,12 +85,32 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 const SizedBox(height: 25),
 
+                // EMAIL ----
+
+                // Icono y correo en fila
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.email, size: 30, color: theme.primary),
+                    const SizedBox(width: 8),
+                    Text(
+                      user.email,
+                      style: TextStyle(color: theme.primary, fontSize: 16),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 35),
+
                 // Bio ----
                 Padding(
                   padding: const EdgeInsets.only(left: 25),
                   child: Row(
                     children: [
-                      Text("Biografía", style: TextStyle(color: theme.primary)),
+                      Text(
+                        "Biografía",
+                        style: TextStyle(color: theme.primary, fontSize: 16),
+                      ),
                     ],
                   ),
                 ),
@@ -111,7 +127,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       Text(
                         "Publicaciones",
-                        style: TextStyle(color: theme.primary),
+                        style: TextStyle(color: theme.primary, fontSize: 16),
                       ),
                     ],
                   ),
