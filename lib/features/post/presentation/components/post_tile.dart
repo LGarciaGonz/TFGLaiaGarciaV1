@@ -6,6 +6,7 @@ import 'package:litlens_v1/features/authentication/presentation/components/my_te
 import 'package:litlens_v1/features/authentication/presentation/cubits/auth_cubit.dart';
 import 'package:litlens_v1/features/post/domain/entities/comment.dart';
 import 'package:litlens_v1/features/post/domain/entities/post.dart';
+import 'package:litlens_v1/features/post/presentation/components/comment_tile.dart';
 import 'package:litlens_v1/features/post/presentation/cubits/posts_cubit.dart';
 import 'package:litlens_v1/features/post/presentation/cubits/posts_state.dart';
 import 'package:litlens_v1/features/profile/domain/entities/profile_user.dart';
@@ -42,7 +43,15 @@ class _PostTileState extends State<PostTile> {
   @override
   void initState() {
     super.initState();
-    getCurrentUser();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final user = context.read<AuthCubit>().currentUser;
+      if (user != null && mounted) {
+        setState(() {
+          currentUser = user;
+          isOwnPost = widget.post.userId == user.uid;
+        });
+      }
+    });
     fetchPostUser();
   }
 
@@ -50,12 +59,7 @@ class _PostTileState extends State<PostTile> {
     final authCubit = context.read<AuthCubit>();
     final user = authCubit.currentUser;
 
-    // if (user != null) {
-    //   setState(() {
-    //     currentUser = user;
-    //     isOwnPost = (widget.post.userId == user.uid);
-    //   });
-    // }
+   
 
     if (user != null && mounted) {
       // Verificación para evitar setState después del dispose
@@ -68,12 +72,6 @@ class _PostTileState extends State<PostTile> {
 
   Future<void> fetchPostUser() async {
     final fetchedUser = await profileCubit.getUserProfile(widget.post.userId);
-
-    // if (fetchedUser != null) {
-    //   setState(() {
-    //     postUser = fetchedUser;
-    //   });
-    // }
 
     if (!mounted) return; // Evita llamar setState si el widget ya fue destruido
     if (fetchedUser != null) {
@@ -178,8 +176,8 @@ class _PostTileState extends State<PostTile> {
     final newComment = Comment(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       postId: widget.post.id,
-      userId: widget.post.userId,
-      userName: widget.post.userName,
+      userId: currentUser!.uid,
+      userName: currentUser!.name,
       text: commentTextController.text,
       timestamp: DateTime.now(),
     );
@@ -418,29 +416,6 @@ class _PostTileState extends State<PostTile> {
                     ),
                   ],
                 ),
-
-                // Align(
-                //   alignment: Alignment.center,
-                //   child: Text(
-                //     'Fecha de publicación:',
-                //     style: TextStyle(
-                //       fontSize: 15,
-                //       fontWeight: FontWeight.w600,
-                //       color: Theme.of(context).colorScheme.primary,
-                //     ),
-                //   ),
-                // ),
-                // const SizedBox(height: 4),
-                // Align(
-                //   alignment: Alignment.center,
-                //   child: Text(
-                //     DateFormat('dd/MM/yyyy').format(widget.post.timestamp),
-                //     style: TextStyle(
-                //       fontSize: 15,
-                //       color: colorScheme.inversePrimary,
-                //     ),
-                //   ),
-                // ),
               ],
             ),
           ),
@@ -454,18 +429,21 @@ class _PostTileState extends State<PostTile> {
                   width: 50,
                   child: Row(
                     children: [
-                      GestureDetector(
-                        onTap: toggleLikePost,
-                        child: Icon(
-                          size: 30,
-                          widget.post.likes.contains(currentUser!.uid)
-                              ? Icons.favorite
-                              : Icons.favorite_border,
-                          color: widget.post.likes.contains(currentUser!.uid)
-                              ? Colors.red
-                              : Theme.of(context).colorScheme.primary,
+                      if (currentUser == null)
+                        SizedBox()
+                      else
+                        GestureDetector(
+                          onTap: toggleLikePost,
+                          child: Icon(
+                            size: 30,
+                            widget.post.likes.contains(currentUser!.uid)
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: widget.post.likes.contains(currentUser!.uid)
+                                ? Colors.red
+                                : Theme.of(context).colorScheme.primary,
+                          ),
                         ),
-                      ),
                       SizedBox(width: 5),
                       Text(
                         widget.post.likes.length.toString(),
@@ -522,25 +500,7 @@ class _PostTileState extends State<PostTile> {
                       final comment = post.comments[index];
 
                       // UI
-                      return Padding(
-                        padding: const EdgeInsets.only(left: 20.0),
-                        child: Row(
-                          children: [
-                            // Nombre del usuario
-                            Text(
-                              comment.userName,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                            const SizedBox(width: 10),
-
-                            // Texto del comentario
-                            Text(comment.text),
-                          ],
-                        ),
-                      );
+                      return CommentTile(comment: comment);
                     },
                   );
                 }
@@ -556,9 +516,7 @@ class _PostTileState extends State<PostTile> {
                   child: Text("Error cargando comentarios: ${state.message}"),
                 );
               } else {
-                return const Center(
-                  child: SizedBox(),
-                );
+                return const Center(child: SizedBox());
               }
             },
           ),
