@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:litlens_v1/features/post/domain/entities/comment.dart';
 
 class Post {
   final String id;
@@ -10,6 +11,7 @@ class Post {
   final int starsNumber;
   final DateTime timestamp;
   final List<String> likes;
+  final List<Comment> comments;
 
   Post({
     required this.id,
@@ -21,6 +23,7 @@ class Post {
     required this.starsNumber,
     required this.timestamp,
     required this.likes,
+    required this.comments,
   });
 
   Post copyWith({
@@ -39,6 +42,7 @@ class Post {
       starsNumber: starsNumber ?? this.starsNumber,
       timestamp: timestamp,
       likes: likes,
+      comments: comments,
     );
   }
 
@@ -54,11 +58,19 @@ class Post {
       'starsNumber': starsNumber,
       'timestamp': Timestamp.fromDate(timestamp),
       'likes': likes,
+      'comments': comments.map((comment) => comment.toJson()).toList(),
     };
   }
 
   // Convertir json a post.
   factory Post.fromJson(Map<String, dynamic> json) {
+    // Preparar los comentarios
+    final List<Comment> comments =
+        (json['comments'] as List<dynamic>?)
+            ?.map((commentJson) => Comment.fromJson(commentJson))
+            .toList() ??
+        [];
+
     return Post(
       id: json['id'],
       userId: json['userId'],
@@ -71,6 +83,7 @@ class Post {
           : (json['starsNumber'] as double).toInt(),
       timestamp: (json['timestamp'] as Timestamp).toDate(),
       likes: List<String>.from(json['likes'] ?? []),
+      comments: comments,
     );
   }
 }

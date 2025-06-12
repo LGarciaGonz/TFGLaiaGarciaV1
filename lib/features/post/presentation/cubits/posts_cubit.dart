@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:litlens_v1/features/post/domain/entities/comment.dart';
 import 'package:litlens_v1/features/post/domain/entities/post.dart';
 import 'package:litlens_v1/features/post/domain/repositories/post_repository.dart';
 import 'package:litlens_v1/features/post/presentation/cubits/posts_state.dart';
@@ -66,6 +67,26 @@ class PostsCubit extends Cubit<PostsState> {
       await postRepository.toggleLikePost(postId, userId);
     } catch (e) {
       emit(PostsError("Error al recuperar los likes de la publicación: $e"));
+    }
+  }
+
+  // Añadir comentario a la publicación
+  Future<void> addComment(String postId, Comment comment) async {
+    try {
+      await postRepository.addComment(postId, comment);
+      await fetchAllPosts();
+    } catch (e) {
+      emit(PostsError("Error al publicar comentario: $e"));
+    }
+  }
+
+  // Eliminar comentario de una publicación
+  Future<void> deleteComment(String postId, String commentId) async {
+    try {
+      await postRepository.deleteComment(postId, commentId);
+      await fetchAllPosts();
+    } catch (e) {
+      emit(PostsError("Error al eliminar comentario: $e"));
     }
   }
 }

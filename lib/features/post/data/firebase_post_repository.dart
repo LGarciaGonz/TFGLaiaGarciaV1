@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:litlens_v1/features/post/domain/entities/comment.dart';
 import 'package:litlens_v1/features/post/domain/entities/post.dart';
 import 'package:litlens_v1/features/post/domain/repositories/post_repository.dart';
 
@@ -102,6 +103,56 @@ class FirebasePostRepository implements PostRepository {
       }
     } catch (e) {
       throw Exception("Error al procesar los likes: $e");
+    }
+  }
+
+  @override
+  Future<void> addComment(String postId, Comment comment) async {
+    try {
+      // Obtener el document del post
+      final postDoc = await postCollection.doc(postId).get();
+
+      if (postDoc.exists) {
+        // Convertir el objeto json a publicación
+        final post = Post.fromJson(postDoc.data() as Map<String, dynamic>);
+
+        // Añadir el nuevo comentario
+        post.comments.add(comment);
+
+        // Actualizar el document en firestore
+        await postCollection.doc(postId).update({
+          'comments': post.comments.map((comment) => comment.toJson()).toList(),
+        });
+      } else {
+        throw Exception("Publicación no encontrada");
+      }
+    } catch (e) {
+      throw Exception("Error publicando el comentario: $e");
+    }
+  }
+
+  @override
+  Future<void> deleteComment(String postId, String commentId) async {
+    try {
+      // Obtener el document del post
+      final postDoc = await postCollection.doc(postId).get();
+
+      if (postDoc.exists) {
+        // Convertir el objeto json a publicación
+        final post = Post.fromJson(postDoc.data() as Map<String, dynamic>);
+
+        // Añadir el nuevo comentario
+        post.comments.removeWhere((comment) => comment.id == commentId);
+
+        // Actualizar el document en firestore
+        await postCollection.doc(postId).update({
+          'comments': post.comments.map((comment) => comment.toJson()).toList(),
+        });
+      } else {
+        throw Exception("Publicación no encontrada");
+      }
+    } catch (e) {
+      throw Exception("Error eliminando el comentario: $e");
     }
   }
 }

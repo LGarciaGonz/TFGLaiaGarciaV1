@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:litlens_v1/features/authentication/domain/entities/app_user.dart';
+import 'package:litlens_v1/features/authentication/presentation/components/my_text_field.dart';
 import 'package:litlens_v1/features/authentication/presentation/cubits/auth_cubit.dart';
 import 'package:litlens_v1/features/post/domain/entities/post.dart';
 import 'package:litlens_v1/features/post/presentation/cubits/posts_cubit.dart';
@@ -43,17 +44,19 @@ class _PostTileState extends State<PostTile> {
     fetchPostUser();
   }
 
-  // void getCurrentUser() {
-  //   final authCubit = context.read<AuthCubit>();
-  //   currentUser = authCubit.currentUser;
-  //   isOwnPost = (widget.post.userId == currentUser!.uid);
-  // }
-
   void getCurrentUser() {
     final authCubit = context.read<AuthCubit>();
     final user = authCubit.currentUser;
 
-    if (user != null) {
+    // if (user != null) {
+    //   setState(() {
+    //     currentUser = user;
+    //     isOwnPost = (widget.post.userId == user.uid);
+    //   });
+    // }
+
+    if (user != null && mounted) {
+      // Verificación para evitar setState después del dispose
       setState(() {
         currentUser = user;
         isOwnPost = (widget.post.userId == user.uid);
@@ -63,6 +66,14 @@ class _PostTileState extends State<PostTile> {
 
   Future<void> fetchPostUser() async {
     final fetchedUser = await profileCubit.getUserProfile(widget.post.userId);
+
+    // if (fetchedUser != null) {
+    //   setState(() {
+    //     postUser = fetchedUser;
+    //   });
+    // }
+
+    if (!mounted) return; // Evita llamar setState si el widget ya fue destruido
     if (fetchedUser != null) {
       setState(() {
         postUser = fetchedUser;
@@ -74,12 +85,9 @@ class _PostTileState extends State<PostTile> {
   * LIKES DE LA PUBLICACIÓN
   */
 
-  // Si el usuario toca el botón de like:
   void toggleLikePost() {
-    // Estado actual del like
     final isLiked = widget.post.likes.contains(currentUser!.uid);
 
-    // Optimizar like y actualización de la UI
     setState(() {
       if (isLiked) {
         widget.post.likes.remove(currentUser!.uid);
@@ -88,11 +96,9 @@ class _PostTileState extends State<PostTile> {
       }
     });
 
-    // Actualizar el like
     postCubit.toggleLikePost(widget.post.id, currentUser!.uid).catchError((
       error,
     ) {
-      // Si se produce un error, volver a los valores originales
       setState(() {
         if (isLiked) {
           widget.post.likes.add(currentUser!.uid);
@@ -103,7 +109,69 @@ class _PostTileState extends State<PostTile> {
     });
   }
 
-  // Opciones para eliminar la publicación.
+  /**
+ * COMENTARIOS
+ */
+  // Text controller para el comentario
+  final commentTextController = TextEditingController();
+
+  // Abrir box de comentario
+  void openNewCommentBox() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text(
+          '¿Seguro que quieres eliminar esta reseña?',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Theme.of(context).colorScheme.inversePrimary,
+            fontSize: 18,
+          ),
+        ),
+        content: MyTextField(
+          controller: commentTextController,
+          hintText: "Escribe tu comentario",
+          obscureText: false,
+        ),
+
+        actions: [
+          // Botón cancelar ----
+          TextButton(
+            onPressed: Navigator.of(context).pop,
+            child: Text(
+              'Cancelar',
+              style: TextStyle(color: Theme.of(context).colorScheme.primary),
+            ),
+          ),
+
+          // Botón Publicar comentario ----
+          ElevatedButton(
+            onPressed: () {
+              // addComment();
+              Navigator.of(context).pop();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.grey.shade700,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: Text(
+              'Publicar',
+              style: TextStyle(
+                color: Colors.grey.shade100,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // CONFIRMAR ELIMINACIÓN DE POST
   void showOptions() {
     showDialog(
       context: context,
@@ -125,7 +193,6 @@ class _PostTileState extends State<PostTile> {
               style: TextStyle(color: Theme.of(context).colorScheme.primary),
             ),
           ),
-
           ElevatedButton(
             onPressed: () {
               widget.onDeletePressed!();
@@ -160,7 +227,7 @@ class _PostTileState extends State<PostTile> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ENCABEZADO (usuario + botón eliminar)
+          // ENCABEZADO
           Container(
             color: colorScheme.tertiary,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -186,7 +253,7 @@ class _PostTileState extends State<PostTile> {
             ),
           ),
 
-          // CONTENIDO DE LA PUBLICACIÓN
+          // CONTENIDO
           Container(
             width: double.infinity,
             color: colorScheme.secondary,
@@ -194,7 +261,6 @@ class _PostTileState extends State<PostTile> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // TÍTULO DEL LIBRO
                 Text.rich(
                   TextSpan(
                     children: [
@@ -222,7 +288,6 @@ class _PostTileState extends State<PostTile> {
 
                 const SizedBox(height: 18),
 
-                // AUTOR
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -247,7 +312,6 @@ class _PostTileState extends State<PostTile> {
                 ),
                 const SizedBox(height: 16),
 
-                // RESEÑA
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -273,7 +337,6 @@ class _PostTileState extends State<PostTile> {
                 ),
                 const SizedBox(height: 20),
 
-                // PUNTUACIÓN
                 Text(
                   'Puntuación:',
                   style: TextStyle(
@@ -285,7 +348,6 @@ class _PostTileState extends State<PostTile> {
 
                 const SizedBox(height: 8),
 
-                // ESTRELLAS
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(5, (index) {
@@ -301,7 +363,6 @@ class _PostTileState extends State<PostTile> {
 
                 const SizedBox(height: 30),
 
-                // FECHA DE PUBLICACIÓN
                 Align(
                   alignment: Alignment.center,
                   child: Text(
@@ -327,25 +388,52 @@ class _PostTileState extends State<PostTile> {
               ],
             ),
           ),
+
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Row(
               children: [
-                // Botón like
-                GestureDetector(
-                  onTap: toggleLikePost,
-                  child: Icon(
-                    widget.post.likes.contains(currentUser!.uid)
-                        ? Icons.favorite
-                        : Icons.favorite_border,
+                // Like
+                SizedBox(
+                  width: 50,
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: toggleLikePost,
+                        child: Icon(
+                          size: 30,
+                          widget.post.likes.contains(currentUser!.uid)
+                              ? Icons.favorite
+                              : Icons.favorite_border,
+                          color: widget.post.likes.contains(currentUser!.uid)
+                              ? Colors.red
+                              : Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                      SizedBox(width: 5),
+                      Text(
+                        widget.post.likes.length.toString(),
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                Text(widget.post.likes.length.toString()),
                 SizedBox(width: 20),
 
-                // Botón comentarios
-                Icon(Icons.comment_outlined),
-                Text('0'),
+                Icon(
+                  Icons.comment_outlined,
+                  size: 30,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                SizedBox(width: 5),
+                Text(
+                  '0',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
               ],
             ),
           ),

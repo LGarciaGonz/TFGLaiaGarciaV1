@@ -81,7 +81,8 @@ class _UploadPostPageState extends State<UploadPostPage> {
       review: reviewController.text.trim(),
       starsNumber: starsNumber,
       timestamp: DateTime.now(),
-      likes: []
+      likes: [],
+      comments: [],
     );
 
     final postCubit = context.read<PostsCubit>();
