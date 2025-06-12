@@ -70,6 +70,39 @@ class _PostTileState extends State<PostTile> {
     }
   }
 
+  /**
+  * LIKES DE LA PUBLICACIÓN
+  */
+
+  // Si el usuario toca el botón de like:
+  void toggleLikePost() {
+    // Estado actual del like
+    final isLiked = widget.post.likes.contains(currentUser!.uid);
+
+    // Optimizar like y actualización de la UI
+    setState(() {
+      if (isLiked) {
+        widget.post.likes.remove(currentUser!.uid);
+      } else {
+        widget.post.likes.add(currentUser!.uid);
+      }
+    });
+
+    // Actualizar el like
+    postCubit.toggleLikePost(widget.post.id, currentUser!.uid).catchError((
+      error,
+    ) {
+      // Si se produce un error, volver a los valores originales
+      setState(() {
+        if (isLiked) {
+          widget.post.likes.add(currentUser!.uid);
+        } else {
+          widget.post.likes.remove(currentUser!.uid);
+        }
+      });
+    });
+  }
+
   // Opciones para eliminar la publicación.
   void showOptions() {
     showDialog(
@@ -152,7 +185,7 @@ class _PostTileState extends State<PostTile> {
               ],
             ),
           ),
-      
+
           // CONTENIDO DE LA PUBLICACIÓN
           Container(
             width: double.infinity,
@@ -186,9 +219,9 @@ class _PostTileState extends State<PostTile> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-      
+
                 const SizedBox(height: 18),
-      
+
                 // AUTOR
                 Align(
                   alignment: Alignment.centerLeft,
@@ -213,7 +246,7 @@ class _PostTileState extends State<PostTile> {
                   ),
                 ),
                 const SizedBox(height: 16),
-      
+
                 // RESEÑA
                 Align(
                   alignment: Alignment.centerLeft,
@@ -239,7 +272,7 @@ class _PostTileState extends State<PostTile> {
                   ),
                 ),
                 const SizedBox(height: 20),
-      
+
                 // PUNTUACIÓN
                 Text(
                   'Puntuación:',
@@ -249,9 +282,10 @@ class _PostTileState extends State<PostTile> {
                     color: Theme.of(context).colorScheme.primary,
                   ),
                 ),
-      
+
                 const SizedBox(height: 8),
-      
+
+                // ESTRELLAS
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(5, (index) {
@@ -264,9 +298,9 @@ class _PostTileState extends State<PostTile> {
                     );
                   }),
                 ),
-      
+
                 const SizedBox(height: 30),
-      
+
                 // FECHA DE PUBLICACIÓN
                 Align(
                   alignment: Alignment.center,
@@ -290,6 +324,28 @@ class _PostTileState extends State<PostTile> {
                     ),
                   ),
                 ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              children: [
+                // Botón like
+                GestureDetector(
+                  onTap: toggleLikePost,
+                  child: Icon(
+                    widget.post.likes.contains(currentUser!.uid)
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                  ),
+                ),
+                Text(widget.post.likes.length.toString()),
+                SizedBox(width: 20),
+
+                // Botón comentarios
+                Icon(Icons.comment_outlined),
+                Text('0'),
               ],
             ),
           ),

@@ -75,4 +75,33 @@ class FirebasePostRepository implements PostRepository {
       throw Exception("Error recogiendo los posts del usuario: $e");
     }
   }
+
+  @override
+  Future<void> toggleLikePost(String postId, String userId) async {
+    try {
+      // Recoger el document de la publicación.
+      final postDoc = await postCollection.doc(postId).get();
+
+      if (postDoc.exists) {
+        final post = Post.fromJson(postDoc.data() as Map<String, dynamic>);
+
+        // Comprobar si el usuario ya ha dado like a esa publicación.
+        final hasLiked = post.likes.contains(userId);
+
+        // Actualizar la lista de likes.
+        if (hasLiked) {
+          post.likes.remove(userId); // Unlike
+        } else {
+          post.likes.add(userId); // Like
+        }
+
+        // Actualizar el document con la nueva lista de likes.
+        await postCollection.doc(postId).update({'likes': post.likes});
+      } else {
+        throw Exception("No se ha encontrado el post");
+      }
+    } catch (e) {
+      throw Exception("Error al procesar los likes: $e");
+    }
+  }
 }

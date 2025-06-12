@@ -24,7 +24,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:litlens_v1/features/authentication/presentation/components/my_bottom_navigation_bar.dart';
-import 'package:litlens_v1/features/authentication/presentation/components/post_tile.dart';
+import 'package:litlens_v1/features/post/presentation/components/post_tile.dart';
 import 'package:litlens_v1/features/authentication/presentation/cubits/auth_cubit.dart';
 import 'package:litlens_v1/features/home/presentation/components/my_drawer.dart';
 import 'package:litlens_v1/features/post/presentation/cubits/posts_cubit.dart';

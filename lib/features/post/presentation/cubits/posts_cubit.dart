@@ -59,4 +59,13 @@ class PostsCubit extends Cubit<PostsState> {
       emit(PostsError("Error al obtener los posts del usuario: $e"));
     }
   }
+
+  // Recuperar los likes de una publicación
+  Future<void> toggleLikePost(String postId, String userId) async {
+    try {
+      await postRepository.toggleLikePost(postId, userId);
+    } catch (e) {
+      emit(PostsError("Error al recuperar los likes de la publicación: $e"));
+    }
+  }
 }

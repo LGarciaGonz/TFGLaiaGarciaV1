@@ -9,6 +9,7 @@ class Post {
   final String review;
   final int starsNumber;
   final DateTime timestamp;
+  final List<String> likes;
 
   Post({
     required this.id,
@@ -19,6 +20,7 @@ class Post {
     required this.review,
     required this.starsNumber,
     required this.timestamp,
+    required this.likes,
   });
 
   Post copyWith({
@@ -36,6 +38,7 @@ class Post {
       review: review ?? this.review,
       starsNumber: starsNumber ?? this.starsNumber,
       timestamp: timestamp,
+      likes: likes,
     );
   }
 
@@ -50,6 +53,7 @@ class Post {
       'review': review,
       'starsNumber': starsNumber,
       'timestamp': Timestamp.fromDate(timestamp),
+      'likes': likes,
     };
   }
 
@@ -66,6 +70,7 @@ class Post {
           ? json['starsNumber']
           : (json['starsNumber'] as double).toInt(),
       timestamp: (json['timestamp'] as Timestamp).toDate(),
+      likes: List<String>.from(json['likes'] ?? []),
     );
   }
 }
