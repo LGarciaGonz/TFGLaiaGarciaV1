@@ -7,6 +7,7 @@ import 'package:litlens_v1/features/post/presentation/components/post_tile.dart'
 import 'package:litlens_v1/features/post/presentation/cubits/posts_cubit.dart';
 import 'package:litlens_v1/features/post/presentation/cubits/posts_state.dart';
 import 'package:litlens_v1/features/profile/presentation/components/bio_box.dart';
+import 'package:litlens_v1/features/profile/presentation/components/follow_button.dart';
 import 'package:litlens_v1/features/profile/presentation/cubits/profile_cubit.dart';
 import 'package:litlens_v1/features/profile/presentation/cubits/profile_state.dart';
 import 'package:litlens_v1/features/profile/presentation/pages/edit_profile_page.dart';
@@ -40,10 +41,26 @@ class _ProfilePageState extends State<ProfilePage> {
     profileCubit.fetchUserProfile(widget.uid);
   }
 
+  // SEGUIR / DEJAR DE SEGUIR
+  void followButtonPressed() {
+    final profileState = profileCubit.state;
+    if (profileState is! ProfileLoaded) {
+      return; // Retornar si el perfil no está cargado
+    }
+
+    final profileUser = profileState.profileUser;
+    final isFollowing = profileUser.followers.contains(currentUser!.uid);
+
+    
+
+    profileCubit.toggleFollow(currentUser!.uid, widget.uid);
+  }
+
   // INTEREFAZ ---------------
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
+    bool isOwnProfile = (widget.uid == currentUser!.uid);
 
     return BlocBuilder<ProfileCubit, ProfileState>(
       builder: (context, state) {
@@ -59,15 +76,17 @@ class _ProfilePageState extends State<ProfilePage> {
               centerTitle: true,
               title: Text(user.name),
               actions: [
-                IconButton(
-                  onPressed: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EditProfilePage(user: user),
+                // Botón editar perfil ----
+                if (isOwnProfile)
+                  IconButton(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditProfilePage(user: user),
+                      ),
                     ),
+                    icon: Icon(Icons.settings),
                   ),
-                  icon: Icon(Icons.settings),
-                ),
               ],
             ),
 
@@ -91,9 +110,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                 const SizedBox(height: 25),
 
-                // EMAIL ----
-
-                // Icono y correo en fila
+                // ICONO E EMAIL ----
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -107,6 +124,15 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
 
                 const SizedBox(height: 35),
+
+                // Botón seguir / dejar de seguir
+                if (!isOwnProfile)
+                  FollowButton(
+                    onPressed: followButtonPressed,
+                    isFollowing: user.followers.contains(currentUser!.uid),
+                  ),
+
+                const SizedBox(height: 25),
 
                 // Bio ----
                 Padding(
