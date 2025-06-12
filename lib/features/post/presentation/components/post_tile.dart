@@ -7,6 +7,7 @@ import 'package:litlens_v1/features/authentication/presentation/cubits/auth_cubi
 import 'package:litlens_v1/features/post/domain/entities/comment.dart';
 import 'package:litlens_v1/features/post/domain/entities/post.dart';
 import 'package:litlens_v1/features/post/presentation/cubits/posts_cubit.dart';
+import 'package:litlens_v1/features/post/presentation/cubits/posts_state.dart';
 import 'package:litlens_v1/features/profile/domain/entities/profile_user.dart';
 import 'package:litlens_v1/features/profile/presentation/cubits/profile_cubit.dart';
 
@@ -394,28 +395,52 @@ class _PostTileState extends State<PostTile> {
                 const SizedBox(height: 30),
 
                 // FECHA ------
-                Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    'Fecha de publicación:',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.primary,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Fecha de publicación:',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        fontStyle: FontStyle.italic,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    DateFormat('dd/MM/yyyy').format(widget.post.timestamp),
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: colorScheme.inversePrimary,
+                    const SizedBox(width: 8),
+                    Text(
+                      DateFormat('dd/MM/yyyy').format(widget.post.timestamp),
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontStyle: FontStyle.italic,
+                        color: Theme.of(context).colorScheme.inversePrimary,
+                      ),
                     ),
-                  ),
+                  ],
                 ),
+
+                // Align(
+                //   alignment: Alignment.center,
+                //   child: Text(
+                //     'Fecha de publicación:',
+                //     style: TextStyle(
+                //       fontSize: 15,
+                //       fontWeight: FontWeight.w600,
+                //       color: Theme.of(context).colorScheme.primary,
+                //     ),
+                //   ),
+                // ),
+                // const SizedBox(height: 4),
+                // Align(
+                //   alignment: Alignment.center,
+                //   child: Text(
+                //     DateFormat('dd/MM/yyyy').format(widget.post.timestamp),
+                //     style: TextStyle(
+                //       fontSize: 15,
+                //       color: colorScheme.inversePrimary,
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -471,6 +496,71 @@ class _PostTileState extends State<PostTile> {
                 ),
               ],
             ),
+          ),
+
+          // SECCIÓN DE COMENTARIOS --------------
+          BlocBuilder<PostsCubit, PostsState>(
+            builder: (context, state) {
+              // Cargado .......
+              if (state is PostsLoaded) {
+                // Post individual
+                final post = state.posts.firstWhere(
+                  (post) => (post.id == widget.post.id),
+                );
+
+                if (post.comments.isNotEmpty) {
+                  // Indicar cuántos comentarios hay para mostrar
+                  int showCommentCount = post.comments.length;
+
+                  // Sección de comentarios ------------
+                  return ListView.builder(
+                    itemCount: showCommentCount,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      // Recoger cada comentario individual
+                      final comment = post.comments[index];
+
+                      // UI
+                      return Padding(
+                        padding: const EdgeInsets.only(left: 20.0),
+                        child: Row(
+                          children: [
+                            // Nombre del usuario
+                            Text(
+                              comment.userName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+
+                            const SizedBox(width: 10),
+
+                            // Texto del comentario
+                            Text(comment.text),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                }
+              }
+
+              // Cargando .......
+              if (state is PostsLoading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              // Error .......
+              else if (state is PostsError) {
+                return Center(
+                  child: Text("Error cargando comentarios: ${state.message}"),
+                );
+              } else {
+                return const Center(
+                  child: SizedBox(),
+                );
+              }
+            },
           ),
         ],
       ),

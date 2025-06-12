@@ -29,6 +29,7 @@ class FirebasePostRepository implements PostRepository {
   Future<void> deletePost(String postId) async {
     try {
       await postCollection.doc(postId).delete();
+      await fetchAllPosts();
     } catch (e) {
       throw Exception("Error eliminando el post: $e");
     }
@@ -38,9 +39,13 @@ class FirebasePostRepository implements PostRepository {
   Future<List<Post>> fetchAllPosts() async {
     try {
       // Recoger todos los posts con el más reciente al principio.
+      // final postSnapshot = await postCollection
+      //     .orderBy('timestamp', descending: true)
+      //     .get();
+
       final postSnapshot = await postCollection
           .orderBy('timestamp', descending: true)
-          .get();
+          .get(GetOptions(source: Source.server));
 
       // Convertir de JSON a lista de posts.
       return postSnapshot.docs

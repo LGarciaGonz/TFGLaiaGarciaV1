@@ -126,7 +126,8 @@ class _HomePageState extends State<HomePage> {
             }
             // Error.
             else if (state is PostsError) {
-              return Center(child: Text("Error al cargar las publicaciones"));
+              return Center(child: Text("Error al cargar las publicaciones. Revise su conexión a internet"));
+              // return Center(child: Text(state.message));
             } else {
               return SizedBox();
             }
@@ -144,94 +145,6 @@ class _HomePageState extends State<HomePage> {
         tertiary: theme.tertiary,
         currentPage: PageType.home,
       ),
-      // bottomNavigationBar: SafeArea(
-      //   child: BottomAppBar(
-      //     color: theme.surface,
-      //     child: SizedBox(
-      //       height: 72, // Altura suficiente para icono + texto + padding
-      //       child: Row(
-      //         mainAxisAlignment: MainAxisAlignment.spaceAround,
-      //         crossAxisAlignment: CrossAxisAlignment.center,
-      //         children: [
-      //           // 📚 LibrerIA
-      //           Expanded(
-      //             child: GestureDetector(
-      //               onTap: () {},
-      //               child: Column(
-      //                 mainAxisAlignment: MainAxisAlignment.center,
-      //                 children: [
-      //                   Icon(Icons.book, color: theme.primary),
-      //                   const SizedBox(height: 4),
-      //                   Text(
-      //                     "LibrerIA",
-      //                     style: TextStyle(color: theme.primary, fontSize: 12),
-      //                   ),
-      //                 ],
-      //               ),
-      //             ),
-      //           ),
-
-      //           // ➕ Botón central más grande y redondo
-      //           Expanded(
-      //             child: GestureDetector(
-      //               onTap: () => Navigator.push(
-      //                 context,
-      //                 MaterialPageRoute(builder: (context) => UploadPostPage()),
-      //               ),
-      //               child: Center(
-      //                 child: Container(
-      //                   width: 56,
-      //                   height: 56,
-      //                   decoration: BoxDecoration(
-      //                     color: theme.inversePrimary,
-      //                     shape: BoxShape.circle,
-      //                   ),
-      //                   child: Center(
-      //                     child: Icon(
-      //                       Icons.add,
-      //                       color: theme.tertiary,
-      //                       size: 28,
-      //                     ),
-      //                   ),
-      //                 ),
-      //               ),
-      //             ),
-      //           ),
-
-      //           // 👤 Mi perfil
-      //           Expanded(
-      //             child: GestureDetector(
-      //               onTap: () {
-      //                 // Recoger el uid del usuario actual.
-      //                 final user = context.read<AuthCubit>().currentUser;
-      //                 String? uid = user!.uid;
-
-      //                 // Navegar a la página del perfil pasando por parámetro el uid del usuario.
-      //                 Navigator.push(
-      //                   context,
-      //                   MaterialPageRoute(
-      //                     builder: (context) => ProfilePage(uid: uid),
-      //                   ),
-      //                 );
-      //               },
-      //               child: Column(
-      //                 mainAxisAlignment: MainAxisAlignment.center,
-      //                 children: [
-      //                   Icon(Icons.person, color: theme.primary),
-      //                   const SizedBox(height: 4),
-      //                   Text(
-      //                     "Mi perfil",
-      //                     style: TextStyle(color: theme.primary, fontSize: 12),
-      //                   ),
-      //                 ],
-      //               ),
-      //             ),
-      //           ),
-      //         ],
-      //       ),
-      //     ),
-      //   ),
-      // ),
     );
   }
 }
