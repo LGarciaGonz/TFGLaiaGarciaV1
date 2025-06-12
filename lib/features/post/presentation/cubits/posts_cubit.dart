@@ -29,7 +29,7 @@ class PostsCubit extends Cubit<PostsState> {
     emit(PostsUploading());
     try {
       await postRepository.createPost(post);
-      fetchAllPosts(); // Recargar los posts después de subir uno nuevo
+      await fetchAllPosts(); // ✅ Esperar a que se complete antes de seguir
     } catch (e) {
       emit(PostsError("Error al subir el post: $e"));
     }

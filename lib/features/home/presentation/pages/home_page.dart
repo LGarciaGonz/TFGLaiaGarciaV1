@@ -58,9 +58,34 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Eliminar post.
-  void deletePost(String postId) {
-    postCubit.deletePost(postId);
-    fetchAllPosts();
+  // void deletePost(String postId) {
+  //   postCubit.deletePost(postId);
+  //   fetchAllPosts();
+  // }
+
+  void deletePost(String postId) async {
+    try {
+      await postCubit.deletePost(postId); // Espera a que se elimine el post
+      fetchAllPosts(); // Actualiza la lista
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Publicación eliminada correctamente'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al eliminar la publicación'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override

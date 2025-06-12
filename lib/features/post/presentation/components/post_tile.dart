@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:litlens_v1/features/authentication/domain/entities/app_user.dart';
 import 'package:litlens_v1/features/authentication/presentation/components/my_text_field.dart';
 import 'package:litlens_v1/features/authentication/presentation/cubits/auth_cubit.dart';
+import 'package:litlens_v1/features/post/domain/entities/comment.dart';
 import 'package:litlens_v1/features/post/domain/entities/post.dart';
 import 'package:litlens_v1/features/post/presentation/cubits/posts_cubit.dart';
 import 'package:litlens_v1/features/profile/domain/entities/profile_user.dart';
@@ -122,7 +123,7 @@ class _PostTileState extends State<PostTile> {
       builder: (context) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
-          '¿Seguro que quieres eliminar esta reseña?',
+          'Añade un comentario',
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Theme.of(context).colorScheme.inversePrimary,
@@ -148,7 +149,7 @@ class _PostTileState extends State<PostTile> {
           // Botón Publicar comentario ----
           ElevatedButton(
             onPressed: () {
-              // addComment();
+              addComment();
               Navigator.of(context).pop();
             },
             style: ElevatedButton.styleFrom(
@@ -169,6 +170,29 @@ class _PostTileState extends State<PostTile> {
         ],
       ),
     );
+  }
+
+  // CREAR NUEVO COMENTARIO
+  void addComment() {
+    final newComment = Comment(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      postId: widget.post.id,
+      userId: widget.post.userId,
+      userName: widget.post.userName,
+      text: commentTextController.text,
+      timestamp: DateTime.now(),
+    );
+
+    // Añadir comentario con cubit
+    if (commentTextController.text.isNotEmpty) {
+      postCubit.addComment(widget.post.id, newComment);
+    }
+  }
+
+  @override
+  void dispose() {
+    commentTextController.dispose();
+    super.dispose();
   }
 
   // CONFIRMAR ELIMINACIÓN DE POST
@@ -227,14 +251,16 @@ class _PostTileState extends State<PostTile> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ENCABEZADO
+          // ENCABEZADO ------------
           Container(
             color: colorScheme.tertiary,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
+                // Icono
                 const Icon(Icons.person, size: 22),
                 const SizedBox(width: 10),
+                // Nombre de usuario
                 Text(
                   widget.post.userName,
                   style: TextStyle(
@@ -244,6 +270,7 @@ class _PostTileState extends State<PostTile> {
                   ),
                 ),
                 const Spacer(),
+                // Botón eliminar publicación
                 if (isOwnPost)
                   IconButton(
                     onPressed: showOptions,
@@ -253,7 +280,7 @@ class _PostTileState extends State<PostTile> {
             ),
           ),
 
-          // CONTENIDO
+          // CONTENIDO ----------------
           Container(
             width: double.infinity,
             color: colorScheme.secondary,
@@ -261,6 +288,7 @@ class _PostTileState extends State<PostTile> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                // TÍTULO ------
                 Text.rich(
                   TextSpan(
                     children: [
@@ -287,7 +315,7 @@ class _PostTileState extends State<PostTile> {
                 ),
 
                 const SizedBox(height: 18),
-
+                // AUTOR ------
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -312,6 +340,7 @@ class _PostTileState extends State<PostTile> {
                 ),
                 const SizedBox(height: 16),
 
+                // RESEÑA ------
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -337,6 +366,7 @@ class _PostTileState extends State<PostTile> {
                 ),
                 const SizedBox(height: 20),
 
+                // PUNTUACIÓN ------
                 Text(
                   'Puntuación:',
                   style: TextStyle(
@@ -347,7 +377,7 @@ class _PostTileState extends State<PostTile> {
                 ),
 
                 const SizedBox(height: 8),
-
+                // ESTRELLAS ------
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(5, (index) {
@@ -363,6 +393,7 @@ class _PostTileState extends State<PostTile> {
 
                 const SizedBox(height: 30),
 
+                // FECHA ------
                 Align(
                   alignment: Alignment.center,
                   child: Text(
@@ -393,7 +424,7 @@ class _PostTileState extends State<PostTile> {
             padding: const EdgeInsets.all(20.0),
             child: Row(
               children: [
-                // Like
+                // BOTÓN LIKE ------
                 SizedBox(
                   width: 50,
                   child: Row(
@@ -422,14 +453,18 @@ class _PostTileState extends State<PostTile> {
                 ),
                 SizedBox(width: 20),
 
-                Icon(
-                  Icons.comment_outlined,
-                  size: 30,
-                  color: Theme.of(context).colorScheme.primary,
+                // BOTÓN COMENTARIOS ------
+                GestureDetector(
+                  onTap: openNewCommentBox,
+                  child: Icon(
+                    Icons.comment_outlined,
+                    size: 30,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
                 SizedBox(width: 5),
                 Text(
-                  '0',
+                  widget.post.comments.length.toString(),
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                   ),
