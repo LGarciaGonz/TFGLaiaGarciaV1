@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:litlens_v1/features/authentication/domain/entities/app_user.dart';
 import 'package:litlens_v1/features/authentication/presentation/components/my_bottom_navigation_bar.dart';
 import 'package:litlens_v1/features/authentication/presentation/cubits/auth_cubit.dart';
+import 'package:litlens_v1/features/post/presentation/components/post_tile.dart';
+import 'package:litlens_v1/features/post/presentation/cubits/posts_cubit.dart';
+import 'package:litlens_v1/features/post/presentation/cubits/posts_state.dart';
 import 'package:litlens_v1/features/profile/presentation/components/bio_box.dart';
 import 'package:litlens_v1/features/profile/presentation/cubits/profile_cubit.dart';
 import 'package:litlens_v1/features/profile/presentation/cubits/profile_state.dart';
@@ -24,6 +27,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // Usuario actual registrado
   late AppUser? currentUser = authCubit.currentUser;
+
+  // Número de posts publicados
+  int postCount = 0;
 
   // Al iniciar:
   @override
@@ -66,20 +72,20 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
 
             // BODY ------------------
-            body: Column(
+            body: ListView(
               children: [
                 const SizedBox(height: 40),
                 // Foto de perfil ----
                 Container(
                   decoration: BoxDecoration(
-                    color: theme.secondary,
+                    // color: theme.secondary,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   height: 120,
                   width: 120,
                   padding: const EdgeInsets.all(25),
                   child: Center(
-                    child: Icon(Icons.person, size: 70, color: theme.primary),
+                    child: Icon(Icons.person, size: 90, color: theme.primary),
                   ),
                 ),
 
@@ -114,7 +120,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 25),
+                const SizedBox(height: 10),
 
                 BioBox(text: user.bio),
 
@@ -131,6 +137,53 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ],
                   ),
+                ),
+
+                // Lista de publicaciones del usuario
+                BlocBuilder<PostsCubit, PostsState>(
+                  builder: (context, state) {
+                    // Posts cargados ......
+                    if (state is PostsLoaded) {
+                      // Filtrar posts por id del usuario
+                      final userPosts = state.posts
+                          .where((post) => post.userId == widget.uid)
+                          .toList();
+
+                      postCount = userPosts.length;
+
+                      return ListView.builder(
+                        itemCount: postCount,
+                        physics: NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          // Recoger cada post individualmente
+                          final post = userPosts[index];
+
+                          // Retornar publicación
+                          return PostTile(
+                            post: post,
+                            onDeletePressed: () =>
+                                context.read<PostsCubit>().deletePost(post.id),
+                          );
+                        },
+                      );
+                    }
+                    // Cargando ......
+                    else if (state is PostsLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else {
+                      return Center(
+                        child: Text(
+                          "Aún no hay publicaciones",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Theme.of(context).colorScheme.primary,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      );
+                    }
+                  },
                 ),
               ],
             ),

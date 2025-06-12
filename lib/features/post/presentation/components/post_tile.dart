@@ -11,6 +11,7 @@ import 'package:litlens_v1/features/post/presentation/cubits/posts_cubit.dart';
 import 'package:litlens_v1/features/post/presentation/cubits/posts_state.dart';
 import 'package:litlens_v1/features/profile/domain/entities/profile_user.dart';
 import 'package:litlens_v1/features/profile/presentation/cubits/profile_cubit.dart';
+import 'package:litlens_v1/features/profile/presentation/pages/profile_page.dart';
 
 class PostTile extends StatefulWidget {
   final Post post;
@@ -58,8 +59,6 @@ class _PostTileState extends State<PostTile> {
   void getCurrentUser() {
     final authCubit = context.read<AuthCubit>();
     final user = authCubit.currentUser;
-
-   
 
     if (user != null && mounted) {
       // Verificación para evitar setState después del dispose
@@ -251,31 +250,40 @@ class _PostTileState extends State<PostTile> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ENCABEZADO ------------
-          Container(
-            color: colorScheme.tertiary,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            child: Row(
-              children: [
-                // Icono
-                const Icon(Icons.person, size: 22),
-                const SizedBox(width: 10),
-                // Nombre de usuario
-                Text(
-                  widget.post.userName,
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                    color: colorScheme.inversePrimary,
+          GestureDetector(
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ProfilePage(uid: widget.post.userId)),
+            ),
+            child: Container(
+              color: colorScheme.tertiary,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              child: Row(
+                children: [
+                  // Icono
+                  const Icon(Icons.person, size: 22),
+                  const SizedBox(width: 10),
+                  // Nombre de usuario
+                  Text(
+                    widget.post.userName,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      color: colorScheme.inversePrimary,
+                    ),
                   ),
-                ),
-                const Spacer(),
-                // Botón eliminar publicación
-                if (isOwnPost)
-                  IconButton(
-                    onPressed: showOptions,
-                    icon: Icon(Icons.delete, color: colorScheme.inversePrimary),
-                  ),
-              ],
+                  const Spacer(),
+                  // Botón eliminar publicación
+                  if (isOwnPost)
+                    IconButton(
+                      onPressed: showOptions,
+                      icon: Icon(
+                        Icons.delete,
+                        color: colorScheme.inversePrimary,
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
 
@@ -516,7 +524,17 @@ class _PostTileState extends State<PostTile> {
                   child: Text("Error cargando comentarios: ${state.message}"),
                 );
               } else {
-                return const Center(child: SizedBox());
+                return Padding(
+                  padding: const EdgeInsets.only(left: 15.0),
+                  child: Text(
+                    'Aún no hay comentarios. ¡Sé el primero en añadir uno!',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.primary,
+                      fontStyle: FontStyle.italic,
+                    ),
+                  ),
+                );
               }
             },
           ),
