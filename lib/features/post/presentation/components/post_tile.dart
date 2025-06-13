@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:litlens_v1/features/authentication/domain/entities/app_user.dart';
 import 'package:litlens_v1/features/authentication/presentation/components/my_text_field.dart';
 import 'package:litlens_v1/features/authentication/presentation/cubits/auth_cubit.dart';
 import 'package:litlens_v1/features/post/domain/entities/comment.dart';
 import 'package:litlens_v1/features/post/domain/entities/post.dart';
-import 'package:litlens_v1/features/post/presentation/components/comment_tile.dart';
+import 'package:litlens_v1/features/post/presentation/components/post_tile_components/comment_section.dart';
+import 'package:litlens_v1/features/post/presentation/components/post_tile_components/post_actions.dart';
+import 'package:litlens_v1/features/post/presentation/components/post_tile_components/post_content.dart';
+import 'package:litlens_v1/features/post/presentation/components/post_tile_components/post_header.dart';
 import 'package:litlens_v1/features/post/presentation/cubits/posts_cubit.dart';
-import 'package:litlens_v1/features/post/presentation/cubits/posts_state.dart';
 import 'package:litlens_v1/features/profile/domain/entities/profile_user.dart';
 import 'package:litlens_v1/features/profile/presentation/cubits/profile_cubit.dart';
-import 'package:litlens_v1/features/profile/presentation/pages/profile_page.dart';
 
 class PostTile extends StatefulWidget {
   final Post post;
@@ -247,299 +247,70 @@ class _PostTileState extends State<PostTile> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 15),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment:
+            CrossAxisAlignment.start, // Alineación general izquierda
         children: [
-          // ENCABEZADO ------------
-          GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ProfilePage(uid: widget.post.userId)),
-            ),
-            child: Container(
-              color: colorScheme.tertiary,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              child: Row(
-                children: [
-                  // Icono
-                  const Icon(Icons.person, size: 22),
-                  const SizedBox(width: 10),
-                  // Nombre de usuario
-                  Text(
-                    widget.post.userName,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                      color: colorScheme.inversePrimary,
-                    ),
-                  ),
-                  const Spacer(),
-                  // Botón eliminar publicación
-                  if (isOwnPost)
-                    IconButton(
-                      onPressed: showOptions,
-                      icon: Icon(
-                        Icons.delete,
-                        color: colorScheme.inversePrimary,
-                      ),
-                    ),
-                ],
-              ),
-            ),
+          PostHeaderWidget(
+            userId: widget.post.userId,
+            userName: widget.post.userName,
+            isOwnPost: isOwnPost,
+            onDeletePressed: showOptions,
+            colorScheme: colorScheme,
           ),
 
-          // CONTENIDO ----------------
-          Container(
-            width: double.infinity,
-            color: colorScheme.secondary,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // TÍTULO ------
-                Text.rich(
-                  TextSpan(
-                    children: [
-                      TextSpan(
-                        text: 'Título: ',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                      TextSpan(
-                        text: '"${widget.post.title}"',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontStyle: FontStyle.italic,
-                          fontWeight: FontWeight.w400,
-                          color: colorScheme.inversePrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-
-                const SizedBox(height: 18),
-                // AUTOR ------
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Autor:',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    widget.post.author,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: colorScheme.inversePrimary,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // RESEÑA ------
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Reseña:',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    widget.post.review,
-                    style: TextStyle(
-                      fontSize: 15,
-                      height: 1.4,
-                      color: colorScheme.inversePrimary,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // PUNTUACIÓN ------
-                Text(
-                  'Puntuación:',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-                // ESTRELLAS ------
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(5, (index) {
-                    return Icon(
-                      index < widget.post.starsNumber
-                          ? Icons.star_rounded
-                          : Icons.star_border_rounded,
-                      color: Colors.amber,
-                      size: 28,
-                    );
-                  }),
-                ),
-
-                const SizedBox(height: 30),
-
-                // FECHA ------
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Fecha de publicación:',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        fontStyle: FontStyle.italic,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      DateFormat('dd/MM/yyyy').format(widget.post.timestamp),
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontStyle: FontStyle.italic,
-                        color: Theme.of(context).colorScheme.inversePrimary,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+          PostContentWidget(
+            title: widget.post.title,
+            author: widget.post.author,
+            review: widget.post.review,
+            starsNumber: widget.post.starsNumber,
+            timestamp: widget.post.timestamp,
+            colorScheme: colorScheme,
           ),
 
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Row(
-              children: [
-                // BOTÓN LIKE ------
-                SizedBox(
-                  width: 50,
-                  child: Row(
-                    children: [
-                      if (currentUser == null)
-                        SizedBox()
-                      else
-                        GestureDetector(
-                          onTap: toggleLikePost,
-                          child: Icon(
-                            size: 30,
-                            widget.post.likes.contains(currentUser!.uid)
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            color: widget.post.likes.contains(currentUser!.uid)
-                                ? Colors.red
-                                : Theme.of(context).colorScheme.primary,
-                          ),
-                        ),
-                      SizedBox(width: 5),
-                      Text(
-                        widget.post.likes.length.toString(),
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 20),
-
-                // BOTÓN COMENTARIOS ------
-                GestureDetector(
-                  onTap: openNewCommentBox,
-                  child: Icon(
-                    Icons.comment_outlined,
-                    size: 30,
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-                SizedBox(width: 5),
-                Text(
-                  widget.post.comments.length.toString(),
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-              ],
-            ),
+          PostActionsWidget(
+            currentUserId: currentUser?.uid,
+            likes: widget.post.likes,
+            commentsCount: widget.post.comments.length,
+            onLikePressed: toggleLikePost,
+            onCommentPressed: openNewCommentBox,
+            colorScheme: colorScheme,
           ),
 
-          // SECCIÓN DE COMENTARIOS --------------
-          BlocBuilder<PostsCubit, PostsState>(
-            builder: (context, state) {
-              // Cargado .......
-              if (state is PostsLoaded) {
-                // Post individual
-                final post = state.posts.firstWhere(
-                  (post) => (post.id == widget.post.id),
-                );
-
-                if (post.comments.isNotEmpty) {
-                  // Indicar cuántos comentarios hay para mostrar
-                  int showCommentCount = post.comments.length;
-
-                  // Sección de comentarios ------------
-                  return ListView.builder(
-                    itemCount: showCommentCount,
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      // Recoger cada comentario individual
-                      final comment = post.comments[index];
-
-                      // UI
-                      return CommentTile(comment: comment);
-                    },
-                  );
-                }
-              }
-
-              // Cargando .......
-              if (state is PostsLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              // Error .......
-              else if (state is PostsError) {
-                return Center(
-                  child: Text("Error cargando comentarios: ${state.message}"),
-                );
-              } else {
-                return Padding(
-                  padding: const EdgeInsets.only(left: 15.0),
-                  child: Text(
-                    'Aún no hay comentarios. ¡Sé el primero en añadir uno!',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Theme.of(context).colorScheme.primary,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                );
-              }
-            },
+          CommentsSectionWidget(
+            postId: widget.post.id,
+            initialComments: widget.post.comments,
           ),
         ],
       ),
     );
   }
+
+  //               if (state is PostsLoading) {
+  //                 return const Center(child: CircularProgressIndicator());
+  //               }
+  //               // Error .......
+  //               else if (state is PostsError) {
+  //                 return Center(
+  //                   child: Text("Error cargando comentarios: ${state.message}"),
+  //                 );
+  //               } else {
+  //                 return Padding(
+  //                   padding: const EdgeInsets.only(left: 15.0),
+  //                   child: Text(
+  //                     'Aún no hay comentarios. ¡Sé el primero en añadir uno!',
+  //                     style: TextStyle(
+  //                       fontSize: 16,
+  //                       color: Theme.of(context).colorScheme.primary,
+  //                       fontStyle: FontStyle.italic,
+  //                     ),
+  //                   ),
+  //                 );
+  //               }
+  //             },
+  //           ),
+  //         ],
+  //       ),
+  //     );
+  //   }
+  // }
 }

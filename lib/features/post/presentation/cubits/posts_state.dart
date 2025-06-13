@@ -22,3 +22,6 @@ class PostsLoaded extends PostsState {
   final List<Post> posts;
   PostsLoaded(this.posts);
 }
+
+// Post creado
+class PostCreated extends PostsState {}

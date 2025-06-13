@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:litlens_v1/features/profile/presentation/components/user_tile.dart';
+import 'package:litlens_v1/features/profile/presentation/components/profile_components/user_tile.dart';
 import 'package:litlens_v1/features/profile/presentation/cubits/profile_cubit.dart';
 
 class FollowerPage extends StatelessWidget {
@@ -64,20 +64,6 @@ Widget _buildUserList(
                 if (snapshot.hasData) {
                   final user = snapshot.data!;
                   return UserTile(user: user);
-                  // return ListTile(
-                  //   title: Row(
-                  //     children: [
-                  //       Icon(
-                  //         Icons.person,
-                  //         color: Theme.of(context).colorScheme.inversePrimary,
-                  //       ),
-                  //       const SizedBox(
-                  //         width: 8,
-                  //       ), // Espaciado entre ícono y texto
-                  //       Text(user.name),
-                  //     ],
-                  //   ),
-                  // );
                 }
                 // Cargando .....
                 else if (snapshot.connectionState == ConnectionState.waiting) {

@@ -20,17 +20,29 @@ class _LoginPageState extends State<LoginPage> {
 
   // Acción al pulsar el botón de iniciar sesión.
   void login() {
-    final String email = emailController.text;
+    final String email = emailController.text.trim();
     final String password = passwordController.text;
     final authCubit = context.read<AuthCubit>();
 
-    if (email.isNotEmpty && password.isNotEmpty) {
-      authCubit.login(email, password);
-    } else {
+    // Validación básica de formato de email
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+
+    if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor, completa todos los campos')),
       );
+      return;
     }
+
+    if (!emailRegex.hasMatch(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, introduce un email válido')),
+      );
+      return;
+    }
+
+    // Si todo es válido, llama al cubit
+    authCubit.login(email, password);
   }
 
   @override
@@ -57,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // LOGO reemplazado por imagen
+                        // LOGO
                         Image.asset(
                           'lib/assets/images/iconoLitlens.png',
                           width: 150,

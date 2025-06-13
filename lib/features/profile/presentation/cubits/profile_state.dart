@@ -14,6 +14,9 @@ class ProfileLoaded extends ProfileState {
   ProfileLoaded(this.profileUser);
 }
 
+// Perfil modificado.
+class ProfileUpdated extends ProfileState {}
+
 // Error.
 class ProfileError extends ProfileState {
   final String message;

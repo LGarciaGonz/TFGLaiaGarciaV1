@@ -31,12 +31,6 @@ class _HomePageState extends State<HomePage> {
     postCubit.fetchAllPosts();
   }
 
-  // Eliminar post.
-  // void deletePost(String postId) {
-  //   postCubit.deletePost(postId);
-  //   fetchAllPosts();
-  // }
-
   void deletePost(String postId) async {
     try {
       await postCubit.deletePost(postId); // Espera a que se elimine el post
@@ -100,11 +94,6 @@ class _HomePageState extends State<HomePage> {
             }
             // Error.
             else if (state is PostsError) {
-              // return Center(
-              //   child: Text(
-              //     "Error al cargar las publicaciones. Revise su conexión a internet",
-              //   ),
-              // );
               return Center(child: Text(state.message));
             } else {
               return SizedBox();

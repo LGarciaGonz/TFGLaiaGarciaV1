@@ -18,12 +18,6 @@ class _CommentTileState extends State<CommentTile> {
   AppUser? currentUser;
   bool isOwnComment = false;
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   getCurrentUser();
-  // }
-
   @override
   void initState() {
     super.initState();
@@ -41,12 +35,6 @@ class _CommentTileState extends State<CommentTile> {
       }
     });
   }
-
-  // void getCurrentUser() {
-  //   final authCubit = context.read<AuthCubit>();
-  //   currentUser = authCubit.currentUser;
-  //   isOwnComment = (widget.comment.userId == currentUser!.uid);
-  // }
 
   void getCurrentUser() {
     final authCubit = context.read<AuthCubit>();
@@ -109,39 +97,6 @@ class _CommentTileState extends State<CommentTile> {
       ),
     );
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   // UI
-  //   return Padding(
-  //     padding: const EdgeInsets.symmetric( horizontal: 20.0),
-  //     child: Row(
-  //       children: [
-  //         // Nombre del usuario
-  //         Text(
-  //           widget.comment.userName,
-  //           style: const TextStyle(fontWeight: FontWeight.bold),
-  //         ),
-
-  //         const SizedBox(width: 10),
-
-  //         // Texto del comentario
-  //         Text(widget.comment.text),
-
-  //         const Spacer(),
-
-  //         if (isOwnComment)
-  //           GestureDetector(
-  //             onTap: showOptions,
-  //             child: Icon(
-  //               Icons.more_horiz,
-  //               color: Theme.of(context).colorScheme.primary,
-  //             ),
-  //           ),
-  //       ],
-  //     ),
-  //   );
-  // }
 
   @override
   Widget build(BuildContext context) {

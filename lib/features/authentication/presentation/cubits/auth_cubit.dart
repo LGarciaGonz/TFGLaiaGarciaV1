@@ -1,4 +1,3 @@
-// ignore_for_file: curly_braces_in_flow_control_structures
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:litlens_v1/features/authentication/domain/entities/app_user.dart';
@@ -36,10 +35,21 @@ class AuthCubit extends Cubit<AuthState> {
       if (user != null) {
         _currentUser = user;
         emit(Authenticated(user));
-      } else
-        emit(Unauthenticated());
+      } else {
+        // En caso de que login retorne null (usuario no autenticado)
+        emit(AuthError("Email o contraseña incorrectos"));
+      }
     } catch (exc) {
-      emit(AuthError(exc.toString()));
+      String errorMessage = "Error desconocido";
+
+      // Informar de que alguno de los campos es incorrecto
+      if (exc.toString().contains("auth")) {
+        errorMessage = "Email o contraseña incorrectos";
+      } else {
+        errorMessage = exc.toString();
+      }
+
+      emit(AuthError(errorMessage));
       emit(Unauthenticated());
     }
   }
@@ -57,8 +67,9 @@ class AuthCubit extends Cubit<AuthState> {
       if (user != null) {
         _currentUser = user;
         emit(Authenticated(user));
-      } else
+      } else {
         emit(Unauthenticated());
+      }
     } catch (exc) {
       emit(AuthError(exc.toString()));
       emit(Unauthenticated());

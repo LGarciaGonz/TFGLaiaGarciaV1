@@ -4,9 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:litlens_v1/features/authentication/domain/entities/app_user.dart';
 import 'package:litlens_v1/features/authentication/presentation/components/my_bottom_navigation_bar.dart';
-import 'package:litlens_v1/features/authentication/presentation/components/my_text_field.dart';
 import 'package:litlens_v1/features/authentication/presentation/cubits/auth_cubit.dart';
 import 'package:litlens_v1/features/post/domain/entities/post.dart';
+import 'package:litlens_v1/features/post/presentation/components/upload_post_components/rating_title.dart';
+import 'package:litlens_v1/features/post/presentation/components/upload_post_components/stars_selector.dart';
+import 'package:litlens_v1/features/post/presentation/components/upload_post_components/upload_app_bar.dart';
+import 'package:litlens_v1/features/post/presentation/components/upload_post_components/upload_button.dart';
+import 'package:litlens_v1/features/post/presentation/components/upload_post_components/upload_form_fields.dart';
+import 'package:litlens_v1/features/post/presentation/components/upload_post_components/upload_header_text.dart';
 import 'package:litlens_v1/features/post/presentation/cubits/posts_cubit.dart';
 import 'package:litlens_v1/features/post/presentation/cubits/posts_state.dart';
 
@@ -93,25 +98,34 @@ class _UploadPostPageState extends State<UploadPostPage> {
   Widget build(BuildContext context) {
     return BlocConsumer<PostsCubit, PostsState>(
       builder: (context, state) {
-        if (state is PostsLoading) {
+        if (state is PostsLoading || state is PostsUploading) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
           );
         }
         return buildUploadPage();
       },
-
       listener: (context, state) {
-        if (state is PostsLoaded) {
+        if (state is PostCreated) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: const Text('¡Tu reseña se publicó correctamente!'),
               backgroundColor: Theme.of(context).colorScheme.primary,
             ),
           );
-          Navigator.pop(
-            context,
-          ); // Esto puede ir antes o después del snackbar, según UX
+          // Limpia campos si quieres, opcional:
+          titleController.clear();
+          authorController.clear();
+          reviewController.clear();
+          setState(() {
+            starsNumber = 0;
+          });
+
+          // Reseteamos el estado para que no se repita el mensaje
+          context.read<PostsCubit>().resetState();
+
+          // Navegamos hacia atrás o a otra página si quieres
+          Navigator.pop(context);
         } else if (state is PostsError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -130,82 +144,29 @@ class _UploadPostPageState extends State<UploadPostPage> {
     final theme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(centerTitle: true, title: const Text("Nueva publicación")),
+      appBar: const UploadAppBar(),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(
-                height: 40,
-              ), // Más separación desde el borde superior
-              Text(
-                "¿Terminaste un libro? ¡Es hora de contarlo todo (sin spoilers)!",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-              ),
+              const SizedBox(height: 40),
+              const UploadHeaderText(),
               const SizedBox(height: 30),
-
-              MyTextField(
-                controller: titleController,
-                hintText: 'Título',
-                obscureText: false,
-              ),
-              const SizedBox(height: 12),
-              MyTextField(
-                controller: authorController,
-                hintText: 'Autor',
-                obscureText: false,
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                height: 150,
-                child: MyTextField(
-                  controller: reviewController,
-                  hintText: 'Reseña',
-                  obscureText: false,
-                  expands: true,
-                ),
+              UploadFormFields(
+                titleController: titleController,
+                authorController: authorController,
+                reviewController: reviewController,
               ),
               const SizedBox(height: 20),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Puntuación:',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                ),
-              ),
+              const RatingTitle(),
               const SizedBox(height: 8),
-              buildStarsSelector(),
-              const SizedBox(height: 30),
-
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isFormValid ? uploadPost : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _isFormValid
-                        ? Theme.of(context)
-                              .colorScheme
-                              .primary // Gris más oscuro
-                        : Theme.of(
-                            context,
-                          ).colorScheme.tertiary, // Gris más claro
-                    foregroundColor: Theme.of(
-                      context,
-                    ).colorScheme.inversePrimary,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  child: const Text(
-                    'Publicar reseña',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
+              StarsSelector(
+                starsNumber: starsNumber,
+                onStarSelected: (index) => setState(() => starsNumber = index),
               ),
+              const SizedBox(height: 30),
+              UploadButton(isFormValid: _isFormValid, onPressed: uploadPost),
             ],
           ),
         ),
@@ -217,27 +178,6 @@ class _UploadPostPageState extends State<UploadPostPage> {
         tertiary: theme.tertiary,
         currentPage: PageType.upload,
       ),
-    );
-  }
-
-  Widget buildStarsSelector() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(5, (index) {
-        int starIndex = index + 1;
-        return IconButton(
-          icon: Icon(
-            starsNumber >= starIndex ? Icons.star : Icons.star_border,
-            color: Colors.amber,
-            size: 32,
-          ),
-          onPressed: () {
-            setState(() {
-              starsNumber = starIndex;
-            });
-          },
-        );
-      }),
     );
   }
 }

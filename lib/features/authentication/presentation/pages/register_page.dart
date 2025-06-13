@@ -21,17 +21,27 @@ class _RegisterPageState extends State<RegisterPage> {
 
   // Pulsación del botón de registro.
   void register() {
-    final String name = nameController.text;
-    final String email = emailController.text;
+    final String name = nameController.text.trim();
+    final String email = emailController.text.trim();
     final String password = passwordController.text;
     final String confirmPassword = confirmPasswordController.text;
 
     final authCubit = context.read<AuthCubit>();
 
+    // Expresión regular básica para validar email
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+
     if (name.isNotEmpty &&
         email.isNotEmpty &&
         password.isNotEmpty &&
         confirmPassword.isNotEmpty) {
+      if (!emailRegex.hasMatch(email)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Por favor, introduce un email válido")),
+        );
+        return; // Salir si el email no es válido
+      }
+
       if (password == confirmPassword) {
         authCubit.register(name, email, password);
       } else {

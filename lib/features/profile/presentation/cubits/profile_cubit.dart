@@ -31,10 +31,34 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   // Actualizar bio
+  // Future<void> updateProfile({required String uid, String? newBio}) async {
+  //   emit(ProfileLoading());
+  //   try {
+  //     // Buscar el perfil actual.
+  //     final currentUser = await profileRepository.fetchUserProfile(uid);
+
+  //     if (currentUser == null) {
+  //       emit(ProfileError("Error al buscar el perfil actualizado."));
+  //       return;
+  //     }
+
+  //     // Actualizar la bio del perfil.
+  //     final updatedProfile = currentUser.copyWith(
+  //       newBio: newBio ?? currentUser.bio,
+  //     );
+
+  //     // Actualizar perfil en el repositorio.
+  //     await profileRepository.updateProfile(updatedProfile);
+
+  //     // Buscar de nuevo el perfil del usuario.
+  //     await fetchUserProfile(uid);
+  //   } catch (e) {
+  //     emit(ProfileError("Error actualizando el perfil: $e"));
+  //   }
+  // }
   Future<void> updateProfile({required String uid, String? newBio}) async {
     emit(ProfileLoading());
     try {
-      // Buscar el perfil actual.
       final currentUser = await profileRepository.fetchUserProfile(uid);
 
       if (currentUser == null) {
@@ -42,15 +66,16 @@ class ProfileCubit extends Cubit<ProfileState> {
         return;
       }
 
-      // Actualizar la bio del perfil.
       final updatedProfile = currentUser.copyWith(
         newBio: newBio ?? currentUser.bio,
       );
 
-      // Actualizar perfil en el repositorio.
       await profileRepository.updateProfile(updatedProfile);
 
-      // Buscar de nuevo el perfil del usuario.
+      // Emitimos estado actualizado antes de recargar perfil
+      emit(ProfileUpdated());
+
+      // Recargamos el perfil actualizado para mostrar los datos nuevos
       await fetchUserProfile(uid);
     } catch (e) {
       emit(ProfileError("Error actualizando el perfil: $e"));
