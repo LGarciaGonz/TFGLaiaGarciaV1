@@ -56,8 +56,16 @@ class ProfileUser extends AppUser {
       name: json['name'],
       bio: json['bio'] ?? '',
       profileImageUrl: json['profileImageUrl'] ?? '',
-      followers: List<String>.from(json['followers' ?? []]),
-      following: List<String>.from(json['following' ?? []]),
+
+      // followers: List<String>.from(json['followers' ?? []]),
+      // following: List<String>.from(json['following' ?? []]),
+      followers: json['followers'] is List
+          ? List<String>.from(json['followers'])
+          : [],
+
+      following: json['following'] is List
+          ? List<String>.from(json['following'])
+          : [],
     );
   }
 }

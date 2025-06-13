@@ -9,6 +9,8 @@ import 'package:litlens_v1/features/post/data/firebase_post_repository.dart';
 import 'package:litlens_v1/features/post/presentation/cubits/posts_cubit.dart';
 import 'package:litlens_v1/features/profile/data/firebase_profile_repository.dart';
 import 'package:litlens_v1/features/profile/presentation/cubits/profile_cubit.dart';
+import 'package:litlens_v1/features/search/data/firebase_search_repository.dart';
+import 'package:litlens_v1/features/search/presentation/cubits/search_cubit.dart';
 import 'package:litlens_v1/themes/light_mode.dart';
 
 class MainApp extends StatelessWidget {
@@ -20,6 +22,9 @@ class MainApp extends StatelessWidget {
 
   // Post repository
   final firebasePostRepo = FirebasePostRepository();
+
+  // Búsqueda repository
+  final firebaseSearchRepo = FirebaseSearchRepository();
 
   MainApp({super.key});
 
@@ -40,6 +45,12 @@ class MainApp extends StatelessWidget {
         // Post cubit.
         BlocProvider<PostsCubit>(
           create: (context) => PostsCubit(firebasePostRepo),
+        ),
+
+        // Búsqueda cubit.
+        BlocProvider<SearchCubit>(
+          create: (context) =>
+              SearchCubit(searchRepository: firebaseSearchRepo),
         ),
       ],
       child: MaterialApp(

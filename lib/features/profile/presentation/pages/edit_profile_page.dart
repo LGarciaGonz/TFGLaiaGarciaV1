@@ -577,6 +577,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:litlens_v1/features/authentication/presentation/components/my_bottom_navigation_bar.dart';
 import 'package:litlens_v1/features/authentication/presentation/components/my_text_field.dart';
 import 'package:litlens_v1/features/profile/domain/entities/profile_user.dart';
 import 'package:litlens_v1/features/profile/presentation/cubits/profile_cubit.dart';
@@ -761,6 +762,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
             ],
           ),
         ),
+      ), // ✅ BottomAppBar con protección contra overflow
+      bottomNavigationBar: CustomBottomNavigationBar(
+        surface: colorScheme.surface,
+        primary: colorScheme.primary,
+        inversePrimary: colorScheme.inversePrimary,
+        tertiary: colorScheme.tertiary,
+        currentPage: PageType.settings,
       ),
     );
   }

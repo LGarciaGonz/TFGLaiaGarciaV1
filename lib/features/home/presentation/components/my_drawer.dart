@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:litlens_v1/features/authentication/presentation/cubits/auth_cubit.dart';
 import 'package:litlens_v1/features/home/presentation/components/my_drawer_tile.dart';
 import 'package:litlens_v1/features/profile/presentation/pages/profile_page.dart';
+import 'package:litlens_v1/features/search/presentation/pages/search_page.dart';
 
 class MyDrawer extends StatelessWidget {
   const MyDrawer({super.key});
@@ -59,12 +60,19 @@ class MyDrawer extends StatelessWidget {
               ),
 
               // Buscar tile
-              MyDrawerTile(title: "BÚSQUEDA", icon: Icons.search, onTap: () {}),
-
-              // Configuración tile
               MyDrawerTile(
-                title: "CONFIGURACIÓN",
-                icon: Icons.settings,
+                title: "BÚSQUEDA",
+                icon: Icons.search,
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SearchPage()),
+                ),
+              ),
+
+              // LibrerIA tile
+              MyDrawerTile(
+                title: "LibrerIA",
+                icon: Icons.book,
                 onTap: () {},
               ),
 
