@@ -49,10 +49,61 @@ class _CommentTileState extends State<CommentTile> {
   }
 
   // CONFIRMAR ELIMINACIÓN DE COMENTARIO
+  // void showOptions() {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       backgroundColor: Theme.of(context).colorScheme.surface,
+  //       title: Text(
+  //         '¿Seguro que quieres eliminar este comentario?',
+  //         style: TextStyle(
+  //           fontWeight: FontWeight.bold,
+  //           color: Theme.of(context).colorScheme.inversePrimary,
+  //           fontSize: 18,
+  //         ),
+  //       ),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: Navigator.of(context).pop,
+  //           child: Text(
+  //             'Cancelar',
+  //             style: TextStyle(color: Theme.of(context).colorScheme.primary),
+  //           ),
+  //         ),
+  //         ElevatedButton(
+  //           onPressed: () {
+  //             context.read<PostsCubit>().deleteComment(
+  //               widget.comment.postId,
+  //               widget.comment.id,
+  //             );
+  //             Navigator.of(context).pop();
+  //           },
+  //           style: ElevatedButton.styleFrom(
+  //             backgroundColor: Colors.grey.shade700,
+  //             shape: RoundedRectangleBorder(
+  //               borderRadius: BorderRadius.circular(30),
+  //             ),
+  //             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+  //           ),
+  //           child: Text(
+  //             'Eliminar',
+  //             style: TextStyle(
+  //               color: Colors.grey.shade100,
+  //               fontWeight: FontWeight.bold,
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
   void showOptions() {
+    final currentContext = context; // Guarda el context original
+
     showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
+      context: currentContext,
+      builder: (dialogContext) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text(
           '¿Seguro que quieres eliminar este comentario?',
@@ -64,7 +115,7 @@ class _CommentTileState extends State<CommentTile> {
         ),
         actions: [
           TextButton(
-            onPressed: Navigator.of(context).pop,
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(
               'Cancelar',
               style: TextStyle(color: Theme.of(context).colorScheme.primary),
@@ -72,11 +123,17 @@ class _CommentTileState extends State<CommentTile> {
           ),
           ElevatedButton(
             onPressed: () {
-              context.read<PostsCubit>().deleteComment(
+              // Usa el context original, no el del builder
+              currentContext.read<PostsCubit>().deleteComment(
                 widget.comment.postId,
                 widget.comment.id,
               );
-              Navigator.of(context).pop();
+
+              Navigator.of(dialogContext).pop();
+
+              ScaffoldMessenger.of(currentContext).showSnackBar(
+                const SnackBar(content: Text("Comentario eliminado con éxito")),
+              );
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.grey.shade700,
